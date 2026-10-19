@@ -1,3 +1,10 @@
+/*
+    YARA Rules - ispaychain / moblus crypto scam cluster
+    Author: Ibtissam
+    Date: 2026-10-19
+    Description: Detects the cloned front-end, BSC staking contracts, and AWS hosting infrastructure.
+*/
+
 rule Crypto_Scam_Ispaychain_Cluster
 {
     meta:
@@ -33,6 +40,7 @@ rule Crypto_Scam_Ispaychain_Cluster
         $bsc_rpc = "bsc-dataseed.binance.org" ascii nocase
         $chain_id = "chainId" ascii nocase
 
+        // Matches the exact 1,701,636 byte cloned payload
         $payload_hash = "5c6723bcc43dc7a34ec30814782bb6cf190e6fccec7c9c004a87be7b90f76f64" ascii nocase
 
     condition:
@@ -84,4 +92,31 @@ rule Crypto_Scam_Ispaychain_Contract_Config
             3 of ($fn_owner, $fn_init, $fn_queue, $fn_team, $fn_liq, $fn_breaker, $fn_plan) or
             ($staking and $queue_wait and $team_direct and $liquidity_bps)
         )
+}
+
+rule Crypto_Scam_Ispaychain_AWS_Infrastructure
+{
+    meta:
+        author = "Ibtissam"
+        date = "2026-10-19"
+        description = "Detects the shared AWS EC2 Tokyo hosting infrastructure for the ispaychain/moblus cluster"
+        threat_level = "high"
+        category = "crypto_scam"
+        reference = "Internal OSINT - IP 57.182.164.182, AWS ap-northeast-1"
+
+    strings:
+        // The AWS EC2 IP hosting all 5 domains
+        $ip = "57.182.164.182" ascii
+        
+        // Server artifacts from the nginx vhost configuration
+        $inode = "6ac49a70" ascii
+        $mtime = "2026-10-06 06:51:28" ascii
+        
+        // The TLS certificate SHA-256 fingerprint (Update this with your full extracted hash)
+        // Example: "E4:A1:47:7B:F5:DF:..."
+        $tls_sha256 = "E4A1477BF5DF" ascii nocase 
+
+    condition:
+        // Detects if the IP is hardcoded in scripts, or if logs/artifacts match the infrastructure
+        any of them
 }
