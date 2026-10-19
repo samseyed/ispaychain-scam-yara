@@ -13,20 +13,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Show repository files
+        run: |
+          pwd
+          find . -maxdepth 3 -type f -print
+
       - name: Install YARA
         run: |
           sudo apt-get update
           sudo apt-get install -y yara
           yara --version
 
-      - name: List YARA files
+      - name: Validate each YARA file
         run: |
-          find . -type f ( -name '*.yar' -o -name '*.yara' ) -print
-
-      - name: Validate YARA rules
-        run: |
-          set -e
-          for rule in $(find rules -type f ( -name '*.yar' -o -name '*.yara' )); do
-            echo "Validating: $rule"
-            yara "$rule" "$rule"
+          set -x
+          for rule in rules/*.yar rules/*.yara; do
+            if [ -f "$rule" ]; then
+              echo "Testing $rule"
+              yara "$rule" "$rule"
+            fi
           done
