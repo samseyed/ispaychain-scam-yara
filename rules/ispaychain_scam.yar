@@ -3,10 +3,9 @@ rule Crypto_Scam_Ispaychain_Cluster
     meta:
         author = "Ibtissam"
         date = "2026-10-19"
-        description = "Detects reported ispaychain and related crypto staking investigation indicators"
+        description = "Detects ispaychain.com / moblus.net crypto staking scam indicators"
         threat_level = "high"
         category = "crypto_scam"
-        reference = "Reported OSINT and smart-contract analysis; independently verify"
 
     strings:
         $domain_1 = "ispaychain.com" ascii nocase
@@ -27,16 +26,14 @@ rule Crypto_Scam_Ispaychain_Cluster
         $eco_contract = "0x35012e2876019c26296cED5c5a9c7d691BAf6340" ascii nocase
         $sink_contract = "0xc8F4285735d2cd11F59F295A594E0c9c69Fa7D4E" ascii nocase
 
-        $approve_function = /approveUsdt|approves*\(/ ascii nocase
-        $stake_function = /stakes*\(/ ascii nocase
+        $approve_function = "approveUsdt" ascii nocase
+        $stake_function = "stake(" ascii nocase
         $allowance_check = "allowance" ascii nocase
         $million_usdt = "1000000000000000000000000" ascii
         $bsc_rpc = "bsc-dataseed.binance.org" ascii nocase
-        $chain_id = /chainId|chain_id/ ascii nocase
+        $chain_id = "chainId" ascii nocase
 
         $payload_hash = "5c6723bcc43dc7a34ec30814782bb6cf190e6fccec7c9c004a87be7b90f76f64" ascii nocase
-
-        $staking_flow = /allowance.{0,800}approveUsdt.{0,800}stake\s*\(/ ascii nocase
 
     condition:
         filesize < 20MB and
@@ -47,8 +44,7 @@ rule Crypto_Scam_Ispaychain_Cluster
             3 of ($staking_contract, $usdt_contract, $ms_token_contract, $referral_contract) or
             2 of ($owner_contract, $market_contract, $eco_contract, $sink_contract) or
             ($approve_function and $stake_function and $allowance_check and $million_usdt) or
-            ($bsc_rpc and $chain_id and $approve_function) or
-            $staking_flow
+            ($bsc_rpc and $chain_id and $approve_function)
         )
 }
 
@@ -57,7 +53,7 @@ rule Crypto_Scam_Ispaychain_Contract_Config
     meta:
         author = "Ibtissam"
         date = "2026-10-19"
-        description = "Detects artifacts containing the reported ispaychain BSC staking contract configuration"
+        description = "Detects artifacts exposing the ispaychain BSC staking contract configuration"
         threat_level = "high"
         category = "crypto_scam"
 
