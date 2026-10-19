@@ -28,3 +28,4 @@ Do not connect a wallet, approve tokens, or send funds to the addresses listed i
 ## Evidence note
 
 Indicators in this repository are investigative leads and require independent verification. A YARA match alone does not prove fraud.
+- Initial YARA-CI verification commit.
