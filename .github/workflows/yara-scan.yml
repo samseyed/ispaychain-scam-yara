@@ -1,35 +1,14 @@
-name: YARA Rule Scan
-
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  yara:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Show repository files
+- name: Validate rules and run safe fixture
         run: |
-          pwd
-          find . -maxdepth 3 -type f -print
-
-      - name: Install YARA
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y yara
-          yara --version
-
-      - name: Validate each YARA file
-        run: |
-          set -x
+          set -e
           for rule in rules/*.yar rules/*.yara; do
             if [ -f "$rule" ]; then
-              echo "Testing $rule"
+              echo "Validating $rule"
               yara "$rule" "$rule"
             fi
           done
+
+          if [ -f samples/test_indicator.txt ]; then
+            echo "Running safe IOC fixture"
+            yara rules/ispaychain_scam.yar samples/test_indicator.txt
+          fi
