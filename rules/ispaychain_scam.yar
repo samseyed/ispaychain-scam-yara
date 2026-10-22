@@ -1,3 +1,4 @@
+// Improved version - reduced false positives - 2026-10-22
 import "hash"
 
 rule Crypto_Scam_Ispaychain_Cluster
