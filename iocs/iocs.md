@@ -2,6 +2,13 @@
 
 These are reported investigation indicators. Verify them against original evidence before treating them as confirmed malicious infrastructure.
 
+## Validation Guidance
+
+- Domains / certificates → query [crt.sh](https://crt.sh) or your preferred Certificate Transparency source.
+- IP `57.182.164.182` → check current reverse DNS, ASN (expected AWS `ap-northeast-1`), and historical hosting.
+- Contract addresses → verify on [BscScan](https://bscscan.com) (ownership, recent transactions, approval volume, whether the staking contract still accepts deposits).
+- Payload hash → only treat as high confidence when **both** exact file size (`1,701,636` bytes) **and** SHA-256 match a captured sample.
+
 ## Domains
 
 - `ispaychain.com`
